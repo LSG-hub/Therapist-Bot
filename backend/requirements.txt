@@ -1,0 +1,11 @@
+fastapi
+uvicorn[standard]
+anthropic
+httpx
+pydantic
+pydantic-settings
+python-dotenv
+structlog
+slowapi
+pytest
+pytest-asyncio
