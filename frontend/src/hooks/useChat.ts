@@ -7,6 +7,8 @@ export const useChat = () => {
     messages: [],
     isLoading: false,
     error: null,
+    sessionId: null,
+    contextUsed: false,
   });
 
   const generateMessageId = (): string => {
@@ -61,8 +63,15 @@ export const useChat = () => {
     setLoading(true);
 
     try {
-      // Send message to API
-      const response = await apiClient.sendMessage(content.trim());
+      // Send message to API with current session ID
+      const response = await apiClient.sendMessage(content.trim(), state.sessionId || undefined);
+      
+      // Update session information
+      setState(prev => ({
+        ...prev,
+        sessionId: response.session_id,
+        contextUsed: response.context_used,
+      }));
       
       // Add therapist response
       addMessage({
@@ -91,14 +100,29 @@ export const useChat = () => {
       messages: [],
       isLoading: false,
       error: null,
+      sessionId: null,
+      contextUsed: false,
     });
+  }, []);
+
+  const startNewSession = useCallback(() => {
+    setState(prev => ({
+      ...prev,
+      sessionId: null,
+      contextUsed: false,
+      messages: [],
+      error: null,
+    }));
   }, []);
 
   return {
     messages: state.messages,
     isLoading: state.isLoading,
     error: state.error,
+    sessionId: state.sessionId,
+    contextUsed: state.contextUsed,
     sendMessage,
     clearChat,
+    startNewSession,
   };
 };

@@ -11,6 +11,8 @@ from slowapi.util import get_remote_address
 from .models import MessageRequest, MessageResponse
 from .services.llm_service import LLMService
 from .services.guardrails import validate_message_content
+from .services.rag_service import RAGService
+from .database.connection import init_database
 from .config import settings
 
 # Load environment variables
@@ -30,14 +32,23 @@ structlog.configure(
 
 logger = structlog.get_logger()
 
-# Initialize LLM service
+# Initialize services
 llm_service = None
+rag_service = None
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # Startup
-    global llm_service
+    global llm_service, rag_service
     logger.info("Starting Therapist Bot API")
+    
+    # Initialize database
+    try:
+        init_database()
+        logger.info("Database initialized successfully")
+    except Exception as e:
+        logger.error("Failed to initialize database", error=str(e))
+        raise
     
     # Initialize LLM service
     llm_service = LLMService(settings.anthropic_api_key)
@@ -50,6 +61,14 @@ async def lifespan(app: FastAPI):
         raise ValueError("Cannot connect to Anthropic API")
     
     logger.info("Anthropic API connection validated")
+    
+    # Initialize RAG service
+    try:
+        rag_service = RAGService(llm_service=llm_service)
+        logger.info("RAG service initialized successfully")
+    except Exception as e:
+        logger.error("Failed to initialize RAG service", error=str(e))
+        raise
     
     yield
     
@@ -119,15 +138,18 @@ async def health_check():
 @limiter.limit(f"{settings.rate_limit_per_minute}/minute")
 async def respond_to_message(message_request: MessageRequest, request: Request):
     """
-    Main endpoint for therapeutic conversations.
+    Main endpoint for therapeutic conversations with RAG-enhanced context awareness.
     Processes user messages through safety guardrails and generates CBT-focused responses.
     """
     user_message = message_request.message.strip()
+    session_id = message_request.session_id
     
     # Log the incoming request (without full message content for privacy)
     logger.info(
         "message_received",
         message_length=len(user_message),
+        session_id=session_id,
+        has_session=session_id is not None,
         client_ip=request.client.host if request.client else "unknown"
     )
     
@@ -139,38 +161,50 @@ async def respond_to_message(message_request: MessageRequest, request: Request):
             logger.warning(
                 "message_validation_failed",
                 message_preview=user_message[:50] + "..." if len(user_message) > 50 else user_message,
-                validation_response=validation_response
+                validation_response=validation_response,
+                session_id=session_id
             )
             
+            # For safety responses, create a simple response without RAG
             return MessageResponse(
                 response=validation_response,
-                timestamp=datetime.utcnow().isoformat()
+                timestamp=datetime.utcnow().isoformat(),
+                session_id=session_id or "safety_response",
+                context_used=False,
+                is_new_session=False
             )
         
-        # Generate therapeutic response using LLM
-        if not llm_service:
-            logger.error("LLM service not initialized")
+        # Generate therapeutic response using RAG service
+        if not rag_service:
+            logger.error("RAG service not initialized")
             raise HTTPException(status_code=500, detail="Service temporarily unavailable")
         
-        therapeutic_response = await llm_service.generate_response(user_message)
+        rag_response = await rag_service.generate_rag_response(user_message, session_id)
         
         # Log successful response (without content for privacy)
         logger.info(
-            "therapeutic_response_generated",
-            response_length=len(therapeutic_response),
-            user_message_length=len(user_message)
+            "rag_response_generated",
+            response_length=len(rag_response["response"]),
+            user_message_length=len(user_message),
+            session_id=rag_response["session_id"],
+            context_used=rag_response["context_used"],
+            is_new_session=rag_response["is_new_session"]
         )
         
         return MessageResponse(
-            response=therapeutic_response,
-            timestamp=datetime.utcnow().isoformat()
+            response=rag_response["response"],
+            timestamp=datetime.utcnow().isoformat(),
+            session_id=rag_response["session_id"],
+            context_used=rag_response["context_used"],
+            is_new_session=rag_response["is_new_session"]
         )
         
     except Exception as e:
         logger.error(
             "error_processing_message",
             error_type=type(e).__name__,
-            error_message=str(e)
+            error_message=str(e),
+            session_id=session_id
         )
         
         # Return graceful error response

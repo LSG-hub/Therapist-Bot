@@ -11,6 +11,11 @@ class MessageRequest(BaseModel):
         description="User's message to the therapist bot",
         example="I've been feeling really anxious about my upcoming presentation at work."
     )
+    session_id: Optional[str] = Field(
+        None,
+        description="Optional session ID for conversation continuity",
+        example="session_abc123"
+    )
 
 class MessageResponse(BaseModel):
     """Response model for therapeutic responses"""
@@ -24,10 +29,20 @@ class MessageResponse(BaseModel):
         description="ISO timestamp of when the response was generated",
         example="2025-01-19T10:30:00.000Z"
     )
-    conversation_id: Optional[str] = Field(
-        None,
-        description="Optional conversation identifier for session tracking",
-        example="conv_abc123"
+    session_id: str = Field(
+        ...,
+        description="Session identifier for conversation tracking",
+        example="session_abc123"
+    )
+    context_used: bool = Field(
+        ...,
+        description="Whether conversation context was used in generating this response",
+        example=True
+    )
+    is_new_session: bool = Field(
+        ...,
+        description="Whether this response initiated a new session",
+        example=False
     )
 
 class HealthResponse(BaseModel):

@@ -10,12 +10,15 @@ export interface Message {
 
 export interface MessageRequest {
   message: string;
+  session_id?: string;
 }
 
 export interface MessageResponse {
   response: string;
   timestamp: string;
-  conversation_id?: string;
+  session_id: string;
+  context_used: boolean;
+  is_new_session: boolean;
 }
 
 export interface ApiError {
@@ -35,6 +38,8 @@ export interface ChatState {
   messages: Message[];
   isLoading: boolean;
   error: string | null;
+  sessionId: string | null;
+  contextUsed: boolean;
 }
 
 // API Configuration

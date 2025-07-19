@@ -9,3 +9,7 @@ structlog
 slowapi
 pytest
 pytest-asyncio
+sqlalchemy
+chromadb
+sentence-transformers
+numpy

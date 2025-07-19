@@ -46,8 +46,11 @@ class ApiClient {
     }
   }
 
-  async sendMessage(message: string): Promise<MessageResponse> {
-    const requestData: MessageRequest = { message };
+  async sendMessage(message: string, sessionId?: string): Promise<MessageResponse> {
+    const requestData: MessageRequest = { 
+      message,
+      session_id: sessionId 
+    };
     
     return this.makeRequest<MessageResponse>('/respond', {
       method: 'POST',
