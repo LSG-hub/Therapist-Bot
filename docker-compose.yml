@@ -1,0 +1,88 @@
+# Docker Compose for Therapist Bot - Local Development & Testing
+# Provides full-stack environment with RAG capabilities
+
+services:
+  # ===============================================
+  # Backend Service (FastAPI + RAG)
+  # ===============================================
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: therapist-bot-backend
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    environment:
+      # Application settings
+      - DEBUG=true
+      - HOST=0.0.0.0
+      - PORT=8000
+      - RATE_LIMIT_PER_MINUTE=10
+      
+      # API Configuration (set via .env file)
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
+      
+      # Database paths (inside container)
+      - DATABASE_URL=sqlite:///./data/sqlite/therapist_bot.db
+    volumes:
+      # Persistent data for RAG
+      - ./backend/data:/app/data
+      # Development: mount source code for hot reload (optional)
+      # - ./backend/app:/app/app
+    networks:
+      - therapist-network
+    healthcheck:
+      test: ["CMD", "python", "-c", "import httpx; httpx.get('http://localhost:8000/health', timeout=5.0)"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+
+  # ===============================================
+  # Frontend Service (React + Nginx)
+  # ===============================================
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: therapist-bot-frontend
+    restart: unless-stopped
+    ports:
+      - "3000:80"
+    networks:
+      - therapist-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    depends_on:
+      - backend
+
+# ===============================================
+# Networks
+# ===============================================
+networks:
+  therapist-network:
+    driver: bridge
+    name: therapist-network
+
+# ===============================================
+# Volumes (for persistent data)
+# ===============================================
+volumes:
+  # Backend data persistence
+  backend-data:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ./backend/data
+
+# ===============================================
+# Development Override
+# ===============================================
+# To use development mode with hot reload:
+# docker-compose -f docker-compose.yml -f docker-compose.dev.yml up

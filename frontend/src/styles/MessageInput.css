@@ -1,0 +1,110 @@
+/* Message Input Styles */
+.message-input-form {
+  background: white;
+  padding: var(--space-4);
+  border-top: 1px solid var(--neutral-200);
+  position: sticky;
+  bottom: 0;
+  z-index: 100;
+}
+
+.message-input-group {
+  display: flex;
+  gap: var(--space-2);
+  align-items: flex-end;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.message-textarea {
+  flex: 1;
+  min-height: 44px;
+  max-height: 120px;
+  padding: var(--space-3);
+  border: 2px solid var(--neutral-300);
+  border-radius: var(--radius-lg);
+  font-family: var(--font-family-base);
+  font-size: var(--font-size-base);
+  line-height: var(--line-height-normal);
+  resize: none;
+  transition: border-color var(--transition-fast);
+  background: white;
+  color: #1f2937; /* Dark gray text - always visible */
+}
+
+.message-textarea::placeholder {
+  color: #9ca3af;
+  opacity: 1;
+}
+
+.message-textarea:focus {
+  outline: none;
+  border-color: var(--primary-500);
+  box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.1);
+}
+
+.message-textarea:disabled {
+  background: #f3f4f6;
+  color: #6b7280;
+  cursor: not-allowed;
+}
+
+.send-button {
+  width: 44px;
+  height: 44px;
+  background: var(--gradient-primary);
+  border: none;
+  border-radius: var(--radius-lg);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  flex-shrink: 0;
+}
+
+.send-button:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-lg);
+}
+
+.send-button:active {
+  transform: translateY(0);
+}
+
+.send-button:disabled {
+  background: var(--neutral-300);
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.input-help-text {
+  font-size: var(--font-size-xs);
+  color: var(--neutral-500);
+  margin-top: var(--space-2);
+  text-align: center;
+}
+
+/* Mobile responsive */
+@media (max-width: 768px) {
+  .message-input-form {
+    padding: var(--space-3);
+  }
+  
+  .message-textarea {
+    font-size: 16px; /* Prevents zoom on iOS */
+  }
+}
+
+/* Accessibility */
+@media (prefers-contrast: high) {
+  .message-textarea {
+    border-width: 3px;
+  }
+  
+  .send-button {
+    border: 2px solid var(--neutral-900);
+  }
+}

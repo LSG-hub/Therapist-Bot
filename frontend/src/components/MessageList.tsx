@@ -5,6 +5,7 @@ import type { Message } from '../types/api';
 
 interface MessageListProps {
   messages: Message[];
+  isLoading?: boolean;
 }
 
 const MessageBubble: React.FC<{ message: Message }> = ({ message }) => {

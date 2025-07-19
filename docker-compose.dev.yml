@@ -1,0 +1,26 @@
+# Docker Compose Development Override
+# Use with: docker-compose -f docker-compose.yml -f docker-compose.dev.yml up
+
+services:
+  backend:
+    volumes:
+      # Mount source code for hot reload in development
+      - ./backend/app:/app/app:ro
+    environment:
+      - DEBUG=true
+      - LOG_LEVEL=debug
+    ports:
+      - "8000:8000"
+    command: ["python", "-m", "app.main", "--reload"]
+
+  frontend:
+    # For development, you might want to run React dev server instead
+    # This override keeps the production build but adds development conveniences
+    environment:
+      - NODE_ENV=development
+    # Uncomment below to use development server instead of nginx
+    # build:
+    #   target: builder
+    # command: ["npm", "run", "dev", "--", "--host", "0.0.0.0"]
+    # ports:
+    #   - "5173:5173"

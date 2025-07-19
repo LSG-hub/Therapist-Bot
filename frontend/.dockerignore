@@ -1,0 +1,78 @@
+# Therapist Bot Frontend - Docker Ignore
+
+# ===== NODE.JS =====
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+
+# ===== BUILD OUTPUTS =====
+dist/
+build/
+.next/
+out/
+
+# ===== DEVELOPMENT =====
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# ===== IDE & EDITORS =====
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.vs/
+
+# ===== OS GENERATED =====
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# ===== LOGS =====
+*.log
+logs/
+
+# ===== TESTING =====
+coverage/
+.nyc_output
+.cache
+.jest/
+
+# ===== TEMPORARY FILES =====
+*.tmp
+*.temp
+.tmp/
+.temp/
+
+# ===== GIT =====
+.git/
+.gitignore
+
+# ===== DOCKER =====
+Dockerfile
+.dockerignore
+docker-compose.yml
+docker-compose.*.yml
+
+# ===== CI/CD =====
+.github/
+.gitlab-ci.yml
+
+# ===== ESLINT =====
+.eslintcache
+
+# ===== TYPESCRIPT =====
+*.tsbuildinfo
+
+# ===== MISC =====
+README.md
+*.md

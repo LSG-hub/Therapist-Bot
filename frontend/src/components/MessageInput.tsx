@@ -1,18 +1,20 @@
 import React, { useState, useRef } from 'react';
 import type { KeyboardEvent } from 'react';
-import { Form, Button, InputGroup } from 'react-bootstrap';
 import { Send } from 'react-bootstrap-icons';
+import '../styles/MessageInput.css';
 
 interface MessageInputProps {
   onSendMessage: (message: string) => void;
   isLoading: boolean;
   disabled?: boolean;
+  placeholder?: string;
 }
 
 const MessageInput: React.FC<MessageInputProps> = ({
   onSendMessage,
   isLoading,
   disabled = false,
+  placeholder = "Share what's on your mind...",
 }) => {
   const [message, setMessage] = useState('');
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -49,39 +51,31 @@ const MessageInput: React.FC<MessageInputProps> = ({
   const isDisabled = isLoading || disabled || !message.trim();
 
   return (
-    <Form onSubmit={handleSubmit} className="mt-3">
-      <InputGroup>
-        <Form.Control
+    <form onSubmit={handleSubmit} className="message-input-form">
+      <div className="message-input-group">
+        <textarea
           ref={textareaRef}
-          as="textarea"
           rows={1}
           value={message}
           onChange={handleTextareaChange}
           onKeyDown={handleKeyDown}
-          placeholder={isLoading ? "Alex is responding..." : "Share what's on your mind..."}
+          placeholder={isLoading ? "Alex is responding..." : placeholder}
           disabled={isLoading || disabled}
-          style={{
-            resize: 'none',
-            minHeight: '40px',
-            maxHeight: '120px',
-            overflow: 'auto',
-          }}
-          className="border-end-0"
+          className="message-textarea"
         />
-        <Button
+        <button
           type="submit"
-          variant="primary"
           disabled={isDisabled}
-          className="px-3"
+          className="send-button"
+          aria-label="Send message"
         >
-          <Send size={16} />
-          <span className="visually-hidden">Send message</span>
-        </Button>
-      </InputGroup>
-      <Form.Text className="text-muted">
+          <Send size={18} />
+        </button>
+      </div>
+      <div className="input-help-text">
         Press Enter to send, Shift+Enter for new line
-      </Form.Text>
-    </Form>
+      </div>
+    </form>
   );
 };
 

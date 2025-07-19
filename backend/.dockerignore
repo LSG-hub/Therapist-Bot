@@ -1,0 +1,106 @@
+# Therapist Bot Backend - Docker Ignore
+
+# ===== PYTHON =====
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# ===== VIRTUAL ENVIRONMENTS =====
+venv/
+env/
+ENV/
+.venv/
+.env/
+
+# ===== IDE & EDITORS =====
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# ===== OS GENERATED =====
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# ===== LOGS & DATABASES =====
+*.log
+*.sqlite
+*.sqlite3
+*.db
+chroma_data/
+data/
+
+# ===== TESTING =====
+.coverage
+.pytest_cache/
+.tox/
+htmlcov/
+.cache
+nosetests.xml
+coverage.xml
+
+# ===== DOCUMENTATION =====
+docs/_build/
+.readthedocs.yml
+
+# ===== TEMPORARY FILES =====
+*.tmp
+*.temp
+.tmp/
+.temp/
+
+# ===== GIT =====
+.git/
+.gitignore
+
+# ===== DOCKER =====
+Dockerfile
+.dockerignore
+docker-compose.yml
+docker-compose.*.yml
+
+# ===== CI/CD =====
+.github/
+.gitlab-ci.yml
+
+# ===== BACKUP FILES =====
+*.bak
+*.backup
+*.orig
+
+# ===== LARGE FILES =====
+*.zip
+*.tar.gz
+*.rar
+*.7z
+
+# ===== SECRETS =====
+.env
+.env.*
+secrets/
+*.pem
+*.key
